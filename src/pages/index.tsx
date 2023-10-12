@@ -10,6 +10,20 @@ export default function Home() {
   
   const { data } = api.events.getAll.useQuery();
 
+  //If a user is logged in, check DB to see if they exist in the DB, if not prompt with component
+  function doesUserExist() {
+    // Check Db if user exists via email, if so do nothing, if not send to finish registration page
+    const userEmail = user?.user?.primaryEmailAddress?.emailAddress;
+    if (userEmail) {
+      const { data } = api.users.getUserByEmail.useQuery(userEmail);
+      console.log(data);
+      if (!data) {
+        return false
+      }
+    }
+    return true
+  }
+
   return (
     <>
       <Head>
@@ -20,6 +34,7 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-center">
         <SignIn />
         <UserButton />
+        {!!user && !doesUserExist() ? <div>Please complete your registration</div> : ""} 
         <div>
           <h1>Upcoming Events:</h1>
           {data?.map((event) => (
