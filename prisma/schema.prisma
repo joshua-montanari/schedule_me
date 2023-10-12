@@ -12,11 +12,37 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Example {
-    id        Int      @id @default(autoincrement())
-    name      String
+enum Role {
+    USER
+    ADMIN
+}
+
+model User {
+    id        String      @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
-    @@index([name])
+    name      String
+    phone     String
+    role      Role     @default(USER)
+    events    Event[]
 }
+
+model Event {
+    id        String      @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    host      User[]
+    name      String
+    location  String
+    start     DateTime
+    end       DateTime
+    invitees  Invitee[]
+}
+
+//One event to many invitees
+model Invitee {
+    eventId     String
+    phone       String @unique
+    event Event @relation(fields: [eventId], references: [id])
+}
+
